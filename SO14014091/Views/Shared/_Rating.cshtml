@@ -1,0 +1,12 @@
+﻿@model SO14014091.Models.Product
+
+<h3>@Model.Name <small>@Model.Description</small></h3>
+
+<div class="ratting-item" data-pid="@Model.Id">
+    <input class="rating" name="vote" type="radio" value="1" />
+    <input class="rating" name="vote" type="radio" value="2" />
+    <input class="rating" name="vote" type="radio" value="3" />
+    <input class="rating" name="vote" type="radio" value="4" />
+    <input class="rating" name="vote" type="radio" value="5" />
+</div>
+<span class="result"></span>

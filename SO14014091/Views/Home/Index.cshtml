@@ -1,0 +1,82 @@
+﻿@model List<SO14014091.Models.Product>
+@{
+    
+}
+<ul class="nav nav-tabs" id="myTab">
+    <li class="active"><a href="#single">Single Product</a></li>
+    <li><a href="#multiple">Multiple Products</a></li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane active" id="single">
+        <h2>Rate a product individually</h2>
+
+        @Html.Partial("_Rating", Model.FirstOrDefault())
+    </div>
+    <div class="tab-pane" id="multiple">
+        <h2>Rate a product list</h2>
+
+        @foreach (var p in Model)
+        { 
+            @Html.Partial("_Rating", p)
+        }
+    </div>
+</div>
+
+@section header {
+    <link href="@Url.Content("~/Content/rating.css")" rel="stylesheet" />
+}
+
+@section scripts {
+    <script src="@Url.Content("~/Scripts/rating.js")"></script>
+    <script>
+        $(function () {
+            //tabs: http://twitter.github.com/bootstrap/javascript.html#tabs 
+            $('#myTab a').click(function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            })
+
+            // ratting system: https://github.com/irfan/jquery-star-rating
+            $('.ratting-item').rating(function (vote, event) {
+                var anchor = $(event.currentTarget),
+                    pid = anchor.closest(".ratting-item").data("pid"),
+                    url = '@Url.Action("RateProduct", "Services")';
+
+                // show message while doing the database round trip
+                $('.ratting-item[data-pid=' + pid + ']')
+                    .next()
+                    .text("Placing your vote...");
+
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: { rate: vote, id: pid },
+                    success: function (data) {
+
+                        if (data.success) {
+                            // all went well, here you can say Thank you
+                            $('.ratting-item[data-pid=' + data.pid + ']')
+                                .next()
+                                .text("Voted! (product id: " + data.pid + ")");
+                        }
+                        else {
+                            // There must be an Exception error, let's show it
+                            $('.ratting-item[data-pid=' + data.pid + ']')
+                                .next()
+                                .text("Something went wrong...");
+                        }
+                    },
+                    error: function (err) {
+                        // the call thrown an error
+                        $('.result').text(err);
+                    },
+                    complete: function () {
+                        //$(".loading").hide();
+                    }
+                });
+            });
+
+        });
+    </script>
+}
